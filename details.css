@@ -12,3 +12,35 @@
 .chart{
     margin: 30px auto;
 }
+
+table {
+    width: 100%;
+    margin: 30px auto;
+    border-collapse: collapse;
+    
+}
+
+.table{
+    margin: 30px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+
+th {
+    background-color: #465a3f;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    color: white;
+    border-collapse: collapse;
+}
+
+#tables-container{
+    display: flex;
+    justify-content: center;
+}
