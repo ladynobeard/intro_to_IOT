@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>  
+    <title>AmbiLamp</title>
+    <link rel="stylesheet" type="text/css " href="header.css">
+    <link rel="stylesheet" type="text/css " href="details.css">  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+    
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <ul>
+            <li><img src="lightbox-base-3.jpg"></li>
+            <li><a href="index.html">AmbiLamp</a></li>
+            <li><a href="details.html">Details</a></li>
+        </ul>
+    </header>
+
+<!-- BUTTONS AND CANVASES -->
+<input type="button" id="temp-btn" class="btn" value="View Temperature Chart" onclick="drawTemp()">
+<canvas id="temp-chart-long" class="chart" width="900" height="350" hidden></canvas>
+<input type="button" id="sound-btn" class="btn" value="View Sound Chart" onclick="drawSound()">
+<canvas id="sound-chart-long" class="chart" width="900" height="350" hidden></canvas>
+
+<!-- TABLES -->
+<div id="tables-container">
+    <div class="table">
+        <table id="temp-table">
+
+        </table>
+    </div>
+    <div class="table">
+        <table id="sound-table">
+
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="details.js"></script>
+</body>
+</html>
+
