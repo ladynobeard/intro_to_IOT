@@ -18,7 +18,7 @@
 ?>
 
 <!-- JSCOLOR PICKER -->
-<input type="button" class="jscolor" id="picker" onchange="update(this.jscolor)" onfocusout="apply()" value=<?php echo "'" . $color . "'"; ?>>
+<input type="button" class="jscolor" id="picker" onchange="update(this.jscolor)" onfocusout="apply()" value=<?php echo "'".$color."'"; ?>>
 
 <!-- FORM -->
 <form method="POST">

@@ -5,7 +5,7 @@ var tempChart = new Chart(tempCtx, {
         labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
         datasets: [{
             label: '# of Temp',
-            data: [12, 19, 3, 5, 2, 3],
+            data: [13, 19, 3, 5, 2, 3],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
@@ -81,5 +81,5 @@ function update(jscolor){
 }
 
 function apply(){
-    document.getElementaryById("smt").click();
+    document.getElementById("smt").click();
 }
