@@ -3,22 +3,28 @@
 <head>
     <title>AbiLamp</title>
     <link rel="stylesheet" type="text/css" href="assets/css/index.css"> 
-    <script src="jscolor.js"></script>
+    <script src="assets/js/jscolor.js"></script>
 </head>
 <body>
 
 <?php
-    include "GPIO.php:;
+    include "GPIO.php";
     include "header.php";
+
+    $color = "EFFFC9";
+    if (isset($_POST['set_color'])){
+        $color = $_POST['color'];
+    }
 ?>
 
 <!-- JSCOLOR PICKER -->
-<input type="button" class="jscolor" id="picker" onchange="update(this.jscolor)" value="EFFFC9">
+<input type="button" class="jscolor" id="picker" onchange="update(this.jscolor)" onfocusout="apply()" value=<?php echo "'" . $color . "'"; ?>>
 
 <!-- FORM -->
-<form>
-    <input type="text" id="color">
-    <input type="submit" value="Set as Defualt" id="set_default">
+<form method="POST">
+    <input type="submit" id="smt" name="set_color" hidden>
+    <input type="text" id="color" name="color">
+    <input type="submit" value="Set as Default" id="set_default">
 </form>
 
 <!-- CHARTS -->
@@ -48,6 +54,7 @@ Nam nec nibh id lorem ultricies luctus id ac elit. Nam euismod quam mauris, nec 
 
 <script type="text/javascript" src="assets/js/index.js"></script>
 </body></html>
+
 
 
 
