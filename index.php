@@ -2,24 +2,18 @@
 <html>
 <head>
     <title>AbiLamp</title>
-    <link rel="stylesheet" type="text/css " href="index.css"> 
-    <link rel="stylesheet" type="text/css " href="header.css"> 
+    <link rel="stylesheet" type="text/css" href="assets/css/index.css"> 
     <script src="jscolor.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
-    <ul>
-        <li><img src="lightbox-base-3.jpg"></li>
-        <li><a href="index.html">AmbiLamp</a></li>
-        <li><a href="details.html">Details</a></li>
-    </ul>
-</header>
+<?php
+    include "GPIO.php:;
+    include "header.php";
+?>
 
 <!-- JSCOLOR PICKER -->
-<input type="button" class="jscolor" id="picker" value="EFFFC9">
+<input type="button" class="jscolor" id="picker" onchange="update(this.jscolor)" value="EFFFC9">
 
 <!-- FORM -->
 <form>
@@ -52,5 +46,8 @@ Nam nec nibh id lorem ultricies luctus id ac elit. Nam euismod quam mauris, nec 
 </p>
 </div>
 
-<script type="text/javascript" src="index.js"></script>
+<script type="text/javascript" src="assets/js/index.js"></script>
 </body></html>
+
+
+
