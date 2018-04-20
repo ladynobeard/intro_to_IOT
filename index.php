@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AbiLamp</title>
+    <title>AmbiLamp</title>
     <link rel="stylesheet" type="text/css" href="assets/css/index.css"> 
     <script src="assets/js/jscolor.js"></script>
 </head>
