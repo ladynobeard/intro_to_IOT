@@ -53,16 +53,24 @@
 	/* BEGIN SOUND DATA PARSING*/
 
 	// pre-fill arrays with 0
-	$hourSums = array_fill(0,24,0);
-	$hourCounts = array_fill(0,24,0);
+	$soundHourSums = array_fill(0,24,0);
+	$soundHourCounts = array_fill(0,24,0);
+
+	$tempHourSums = array_fill(0,24,0);
+	$tempHourCounts = array_fill(0,24,0);
 
 	//Create sums for the readings from each hour, and
 	//the number of readings for that hour
+	foreach ($temperatureCursor as $doc){
+		$time = (int)split('[- :]', $doc['time'])[3]; //get hour of the date in 24-hour
+		$tempHourCounts[$time] = $tempHourCounts[$time] + 1;
+		$tempHourSums[$time] = $tempHourSums[$time] + $doc['val'];	
+	}
+
 	foreach ($soundCursor as $doc){
-		$time = (int)split('[- :]', $doc['time'])[3]; //get the hour of the date in 24-hour
-		$hourCounts[$time] = $hourCounts[$time] + 1;
-		$hourSums[$time] = $hourSums[$time] + $doc['audio'];
-		echo $time.'<br>';
+		$time = (int)split('[- :]', $doc['time'])[3]; //get hour of the date in 24-hour
+		$soundHourCounts[$time] = $soundHourCounts[$time] + 1;
+		$soundHourSums[$time] = $soundHourSums[$time] + $doc['audio'];	
 	}
 
 	//parse these arrays to create arrays of averages by hour
@@ -71,31 +79,53 @@
 	$soundDataDay = '[';
 	$soundDataNight = '[';
 
-	for($i = 0; $i < 24; $i = $i + 1){
-		$hourSums[$i] = $hourSums[$i]/$hourCounts[$i]; // calculates average
+	$tempMin = 100;
+	$tempMax = 50;
+	$tempDataDay = '[';
+	$tempDataNight = '[';
 
-		if ((float)$hourSums[$i] > $soundMax){
-			$soundMax = (float)$hourSums[$i]; // update max value
+	for($i = 0; $i < 24; $i = $i + 1){
+		$soundHourSums[$i] = $soundHourSums[$i]/$soundHourCounts[$i]; // calculates avg.
+
+		if ((float)$soundHourSums[$i] > $soundMax){
+			$soundMax = (float)$soundHourSums[$i]; // update max value
 		}
 		
-		if ((float)$hourSums[$i] < $soundMin){
-			$soundMin = (float)$hourSums[$i]; // update min value
+		if ((float)$soundHourSums[$i] < $soundMin){
+			$soundMin = (float)$soundHourSums[$i]; // update min value
 		}
 
 		//determine whether to add the value to daytime array
 		//or nighttime array
 
-		echo $hourSums[$i].'<br>';
 		if ($i < 12){
-			$soundDataDay = $soundDataDay . (float)$hourSums[$i] . ",";
+			$soundDataDay = $soundDataDay . (float)$soundHourSums[$i] . ",";
 		}
 		else {
-			$soundDataNight = $soundDataNight . (float)$hourSums[$i] . ",";
+			$soundDataNight = $soundDataNight . (float)$soundHourSums[$i] . ",";
+		}
+
+		$tempHourSums[$i] = $tempHourSums[$i]/$tempHourCounts[$i]; // calculates avg.
+
+		if ((float)$tempHourSums[$i] > $tempMax){
+			$tempMax = (float)$tempHourSums[$i]; // update max value
+		}
+		
+		if ((float)$tempHourSums[$i] < $tempMin){
+			$tempMin = (float)$tempHourSums[$i]; // update min value
+		}
+
+		//determine whether to add the value to daytime array
+		//or nighttime array
+
+		if ($i < 12){
+			$tempDataDay = $tempDataDay . (float)$tempHourSums[$i] . ",";
+		}
+		else {
+			$tempDataNight = $tempDataNight . (float)$tempHourSums[$i] . ",";
 		}
 	}
 
-	echo $soundDataDay.'<br>';
-	echo $soundDataNight.'<br>';
 
 	$soundMax = trim($soundMax, ",");
 	$soundMax = $soundMax;
@@ -117,6 +147,28 @@
 	echo "<script>";
 	echo "var soundDataDay = " . $soundDataDay . ";";
 	echo "var soundDataNight  = " . $soundDataNight . ";";
+	echo "</script>";
+
+	$tempMax = trim($tempMax, ",");
+	$tempMax = $tempMax;
+
+	$tempMin = trim($tempMin, ",");
+	$tempMin = $tempMin;
+	
+	echo "<script>";
+	echo "var tempMax = " . $tempMax . ";";
+	echo "var tempMin  = " . $tempMin . ";";
+	echo "</script>";
+
+	$tempDataDay = trim($tempDataDay, ",");
+	$tempDataDay = $tempDataDay . "]";
+
+	$tempDataNight = trim($tempDataNight, ",");
+	$tempDataNight = $tempDataNight . "]";
+	
+	echo "<script>";
+	echo "var tempDataDay = " . $tempDataDay . ";";
+	echo "var tempDataNight  = " . $tempDataNight . ";";
 	echo "</script>";
 
 
