@@ -2,68 +2,141 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AmbiLamp</title>
-    <link rel="stylesheet" type="text/css" href="assets/css/index.css"> 
-    <script src="assets/js/jscolor.js"></script>
+	<title>AmbiLamp</title>
+	<link rel="stylesheet" type="text/css" href="assets/css/index.css"> 
+	<script src="assets/js/jscolor.js"></script>
 </head>
 <body>
 
 <?php
-    include "GPIO.php";
-    include "header.php";
 
-    $color = "EFFFC9";
-    if (isset($_POST['set_color'])){
-        $color = $_POST['color'];
-   }
-   if (isset($_POST['set_default'])) {
- $color_data->insert($_POST['color']);
-}
-/* BEGIN LED CODE */
-/********************************************************
- * * Use the LED schematic in Challenge 2, LED Circuit
- * * to complete these constructor lines.
- * ********************************************************/
-$red = new GPIO(22, "out",4);
-$green = new GPIO(27, "out",3);
-$blue = new GPIO(17, "out",1);
-$colorArray = $color.str_split();
-/*********************************************************
- * * Our colors are in hexadecimal - that is, come in the
- * * form #------ where each dash is a character in the set
- * * {0 1 2 3 4 5 6 7 8 9 a b c d e f}, which is the number
- * * system in base 16. The RGB LED accepts values 0-255 for
- * * each of the three colors. Conveniently, 255 is the
- * * largest decimal value of two hexademical digits. That
- * * is, #FF = (15 * 16^1) + (15 * 16^0) = 255. Thus, in a
- * * hex color such as #BAD94D, the red PWM value is
- * * respresented by #BA, green by #D9, and blue by #4D.
- * * The str_split() function above turns our color string
- * * into an array of characters (e.g. [B, A, D, 9, 4, D])
- * * and we pwm_write() red with the decimal value of #BA in
- * * the line below. Follow this reasoning to complete the
- * * pwm_write()inputs for green and blue.
- * ********************************************************/
-$red->pwm_write(hexdec($colorArray[0].$colorArray[1]));
-$green->pwm_write(hexdec($colorArray[2].$colorArray[3]));
-$blue->pwm_write(hexdec($colorArray[4].$colorArray[5]));
-/* END LED CODE */
+	include "GPIO.php";
+	include "header.php";
+
+	 //Begin Color 
+	$default_color = "EFFFC9";
+	$db = connectMongo();
+
+	$color_data = $db->color;
+	$sounds = $db->sound;
+	$temperatures = $db->temp;
+
+	$cursorColor = $color_data->find()->sort(array('entry' => -1))->limit(1);
+	$soundCursor = $sounds->find()->sort(array('entry'=> -1))->limit(24);
+	$temperatureCursor = $temperatures->find()->sort(array('entry'=> -1))->limit(24);
+
+	if (isset($_POST['set_default'])){	
+		$num_entries = $color_data->count();
+		$color_dict = array('color' => $_POST['color'], 'entry' => $num_entries + 1);
+		$color_data->insert($color_dict);
+	}
+       	
+	foreach($cursorColor as $doc){
+		$default_color = $doc['color'];	
+	}
+
+	if (isset($_POST['set_color'])){
+		$default_color = $_POST['color'];
+	}
+
+	/* BEGIN LED CODE */
+	$red = new GPIO(22, "out",4);
+	$green = new GPIO(27, "out",3);
+	$blue = new GPIO(17, "out",1);
+	$colorArray = $default_color.str_split();
+
+	$red->pwm_write(hexdec($colorArray[0].$colorArray[1]));
+	$green->pwm_write(hexdec($colorArray[2].$colorArray[3]));
+	$blue->pwm_write(hexdec($colorArray[4].$colorArray[5]));
+	/* END LED CODE */
+
+	/* BEGIN SOUND DATA PARSING*/
+
+	// pre-fill arrays with 0
+	$hourSums = array_fill(0,24,0);
+	$hourCounts = array_fill(0,24,0);
+
+	//Create sums for the readings from each hour, and
+	//the number of readings for that hour
+	foreach ($soundCursor as $doc){
+		$time = (int)split('[- :]', $doc['time'])[3]; //get the hour of the date in 24-hour
+		$hourCounts[$time] = $hourCounts[$time] + 1;
+		$hourSums[$time] = $hourSums[$time] + $doc['audio'];
+		echo $time.'<br>';
+	}
+
+	//parse these arrays to create arrays of averages by hour
+	$soundMin = 1000;
+	$soundMax = 0;
+	$soundDataDay = '[';
+	$soundDataNight = '[';
+
+	for($i = 0; $i < 24; $i = $i + 1){
+		$hourSums[$i] = $hourSums[$i]/$hourCounts[$i]; // calculates average
+
+		if ((float)$hourSums[$i] > $soundMax){
+			$soundMax = (float)$hourSums[$i]; // update max value
+		}
+		
+		if ((float)$hourSums[$i] < $soundMin){
+			$soundMin = (float)$hourSums[$i]; // update min value
+		}
+
+		//determine whether to add the value to daytime array
+		//or nighttime array
+
+		echo $hourSums[$i].'<br>';
+		if ($i < 12){
+			$soundDataDay = $soundDataDay . (float)$hourSums[$i] . ",";
+		}
+		else {
+			$soundDataNight = $soundDataNight . (float)$hourSums[$i] . ",";
+		}
+	}
+
+	echo $soundDataDay.'<br>';
+	echo $soundDataNight.'<br>';
+
+	$soundMax = trim($soundMax, ",");
+	$soundMax = $soundMax;
+
+	$soundMin = trim($soundMin, ",");
+	$soundMin = $soundMin;
+	
+	echo "<script>";
+	echo "var soundMax = " . $soundMax . ";";
+	echo "var soundMin  = " . $soundMin . ";";
+	echo "</script>";
+
+	$soundDataDay = trim($soundDataDay, ",");
+	$soundDataDay = $soundDataDay . "]";
+
+	$soundDataNight = trim($soundDataNight, ",");
+	$soundDataNight = $soundDataNight . "]";
+	
+	echo "<script>";
+	echo "var soundDataDay = " . $soundDataDay . ";";
+	echo "var soundDataNight  = " . $soundDataNight . ";";
+	echo "</script>";
+
+
+/* END SOUND DATA PARSING*/
 ?>
 
 <!-- JSCOLOR PICKER -->
-<input type="button" class="jscolor" id="picker" onchange="update(this.jscolor)" onfocusout="apply()" value=<?php echo "'".$color."'"; ?>>
+<input type="button" class="jscolor" id="picker" onchange="update(this.jscolor)" onfocusout="apply()" value=<?php echo "'".$default_color."'"; ?>>
 
 <!-- FORM -->
 <form method="POST">
-    <input type="submit" id="smt" name="set_color" hidden>
-    <input type="text" id="color" name="color">
-    <input type="submit" value="Set as Default" id="set_default">
+	<input type="text" id="color" name="color">
+	<input type="submit" id="smt" name="set_color" hidden>
+	<input type="submit" value="Set as Default" id="set_default" name="set_default">
 </form>
 
 <!-- CHARTS -->
 <div id="charts-container">
-    <canvas id="temp-chart" class="chart" height="350" width="550"></canvas>
-    <canvas id="sound-chart" class="chart" height="350" width="550"></canvas>
+	<canvas id="temp-chart" class="chart" height="350" width="550"></canvas>
+	<canvas id="sound-chart" class="chart" height="350" width="550"></canvas>
 </div>
 
 <!-- ABOUT -->

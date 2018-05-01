@@ -5,48 +5,33 @@ var soundCtx;
 var soundChart;
 var soundCounter = 0;
 
+
 function drawTemp(){
     tempCounter++;
     tempCtx = document.getElementById("temp-chart-long").getContext('2d');
 
+	console.log(temperatureX);
     if((tempCounter = tempCounter % 2)==0){
         tempChart.destroy();
     }else{
         
         tempChart = new Chart(tempCtx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                labels: temperatureX,
                 datasets: [{
-                    label: '# of Temp',
-                    data: [12, 19, 3, 5, 2, 3],
+                    label: 'Temperature Readings',
+                    data: temperatureData,
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
                         'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
                     ],
                     borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
+                        'rgba(153, 102, 255, 1)'
+		    ],
                     borderWidth: 1
                 }]
             },
             options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
-                },
                 responsive: false
             }
         });
@@ -63,39 +48,22 @@ function drawSound(){
     }else{
         
         soundChart = new Chart(soundCtx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                labels: soundX,
                 datasets: [{
-                    label: '# of Temp',
-                    data: [12, 19, 3, 5, 2, 3],
+                    label: 'Sound Readings',
+                    data: soundData,
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
                         'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
                     ],
                     borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
+                        'rgba(153,102,255,1)'
                     ],
                     borderWidth: 1
                 }]
             },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero:true
-                        }
-                    }]
-                },
+            options: {  
                 responsive: false
             }
         });
